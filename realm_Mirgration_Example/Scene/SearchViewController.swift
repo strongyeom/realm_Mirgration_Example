@@ -7,9 +7,11 @@
 
 import UIKit
 import SnapKit
+import RealmSwift
 
 class SearchViewController: UIViewController {
 
+    let realm = try! Realm()
     
     lazy var collectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout())
@@ -20,6 +22,21 @@ class SearchViewController: UIViewController {
         return view
     }()
     
+    let memoTextField = {
+        let textField = UITextField()
+        textField.borderStyle = .none
+        textField.layer.borderColor = UIColor.black.cgColor
+        textField.layer.borderWidth = 1
+        textField.placeholder = "메모를 입력해주세요"
+        textField.textAlignment = .center
+        textField.font = .boldSystemFont(ofSize: 15)
+        return textField
+    }()
+    
+    var imageUrl: String?
+    
+    var cell: SearchCollectionViewCell?
+    
     private var imageList: Photo = Photo(total: 0, total_pages: 0, results: [])
      
     override func viewDidLoad() {
@@ -27,7 +44,7 @@ class SearchViewController: UIViewController {
         settup()
         setConstraints()
         callRequest()
-     
+       
     }
     
     func callRequest() {
@@ -42,12 +59,36 @@ class SearchViewController: UIViewController {
     }
      
     func settup() {
+        view.backgroundColor = .white
         view.addSubview(collectionView)
+        view.addSubview(memoTextField)
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "저장", style: .plain, target: self, action: #selector(saveBtnClicked))
+    }
+    
+    @objc func saveBtnClicked() {
+        print("저장 버튼 눌림")
+        
+        let tasks = UnsplashTable(thumnailUrl: imageUrl!, memoText: memoTextField.text!)
+        
+        try! realm.write {
+            realm.add(tasks)
+        }
+        
+        saveImageToDocument(fileName: "\(tasks._id).jpg", image: cell!.imageView.image!)
+        navigationController?.popViewController(animated: true)
     }
     
     func setConstraints() {
         collectionView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.horizontalEdges.equalToSuperview()
+            make.height.equalTo(400)
+        }
+        
+        memoTextField.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.leading.equalTo(view).offset(10)
+            make.height.equalTo(50)
         }
     }
 
@@ -83,8 +124,13 @@ extension SearchViewController: UICollectionViewDataSource, UICollectionViewDele
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         
         let data = imageList.results![indexPath.item].urls.full
+        cell = collectionView.cellForItem(at: indexPath) as? SearchCollectionViewCell
+        
+        imageUrl = data
+      
         print(indexPath)
-        navigationController?.popViewController(animated: true)
+        
+       
     }
     
     private func collectionViewLayout() -> UICollectionViewFlowLayout {

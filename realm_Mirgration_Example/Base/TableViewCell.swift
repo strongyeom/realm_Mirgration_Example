@@ -17,7 +17,7 @@ class TableViewCell : UITableViewCell {
         return image
     }()
     
-    let bookTitle = {
+    let memoText = {
         let label = UILabel()
         label.text = "제목"
         return label
@@ -39,7 +39,7 @@ class TableViewCell : UITableViewCell {
     }
     
     func configure() {
-        [bookImageView, bookTitle, bookprice].forEach {
+        [bookImageView, memoText, bookprice].forEach {
             contentView.addSubview($0)
         }
     }
@@ -51,14 +51,14 @@ class TableViewCell : UITableViewCell {
             make.width.equalTo(100)
         }
         
-        bookTitle.snp.makeConstraints { make in
+        memoText.snp.makeConstraints { make in
             make.leading.equalTo(bookImageView.snp.trailing).offset(10)
             make.top.trailing.equalToSuperview().inset(10)
         }
         
         bookprice.snp.makeConstraints { make in
             make.leading.equalTo(bookImageView.snp.trailing).offset(10)
-            make.top.equalTo(bookTitle.snp.bottom).offset(10)
+            make.top.equalTo(memoText.snp.bottom).offset(10)
             make.bottom.trailing.equalToSuperview().inset(10)
         }
     }

@@ -7,8 +7,11 @@
 
 import UIKit
 import SnapKit
+import RealmSwift
 
 class ViewController: UIViewController {
+    
+    let realm = try! Realm()
     
     let bookTableView = UITableView(frame: .zero, style: .plain)
 
@@ -17,6 +20,7 @@ class ViewController: UIViewController {
         print("ViewController - viewDidLoad")
         settup()
         setConstraints()
+        print(realm.configuration.fileURL)
     }
     
     func settup() {
