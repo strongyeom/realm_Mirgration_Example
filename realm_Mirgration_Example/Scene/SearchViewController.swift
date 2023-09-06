@@ -13,6 +13,8 @@ class SearchViewController: UIViewController {
 
     let realm = try! Realm()
     
+    var completionHandler: (() -> Void)?
+    
     lazy var collectionView = {
         let view = UICollectionView(frame: .zero, collectionViewLayout: collectionViewLayout())
         view.register(SearchCollectionViewCell.self, forCellWithReuseIdentifier: "SearchCollectionViewCell")
@@ -57,6 +59,18 @@ class SearchViewController: UIViewController {
             }
         }
     }
+    
+    func realmContentsUpdate() {
+        let task = UnsplashTable(value: ["thumbnailUrl": memoTextField.text!,
+                                         "memoText": memoTextField.text!])
+        try! realm.write {
+            // 전체 업데이트 할 수 있음 
+            realm.add(task, update: .modified)
+            
+            // 원하는 것만 업데이트 할 수 있음
+            realm.create(UnsplashTable.self, value: ["thumbnailUrl": memoTextField.text!], update: .modified)
+        }
+    }
      
     func settup() {
         view.backgroundColor = .white
@@ -74,7 +88,7 @@ class SearchViewController: UIViewController {
         try! realm.write {
             realm.add(tasks)
         }
-        
+        completionHandler?()
         saveImageToDocument(fileName: "\(tasks._id).jpg", image: cell!.imageView.image!)
         navigationController?.popViewController(animated: true)
     }

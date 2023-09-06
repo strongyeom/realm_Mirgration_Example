@@ -9,6 +9,35 @@ import UIKit
 
 extension UIViewController {
     
+    
+    func removeImageToDocument(fileName: String) {
+        // 1. 도큐먼트 폴더 경로 찾기
+        guard let documnentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return }
+        // 2. 저장할 경로 설정 ( 세부 경로, 이미지를 저장할 위치 )
+        let fileURL = documnentDirectory.appendingPathComponent(fileName)
+        do {
+            try FileManager.default.removeItem(at: fileURL)
+        } catch {
+            print(error)
+        }
+        
+    }
+    
+    func loadImageToDocument(fileName: String) -> UIImage {
+        // 1. 도큐먼트 폴더 경로 찾기
+        guard let documnentDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else { return UIImage(systemName: "flame")! }
+        // 2. 저장할 경로 설정 ( 세부 경로, 이미지를 저장할 위치 )
+        let fileURL = documnentDirectory.appendingPathComponent(fileName)
+       
+        if FileManager.default.fileExists(atPath: fileURL.path) {
+            return UIImage(contentsOfFile: fileURL.path)!
+        } else {
+            return UIImage(systemName: "flame")!
+        }
+        
+        
+    }
+    
     // MARK: - 도큐먼트 폴더에 이미지를 저장하는 메서드
     // PK를 이용해서 PK.jpg 형식으로 만들면 새로운 이미지 컬럼을 만들지 않아도 됨
     func saveImageToDocument(fileName: String, image: UIImage) {
